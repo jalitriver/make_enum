@@ -2,6 +2,9 @@
 #define MAKE_ENUM_H_LWER8VDLTCWRMVF19GJNGDHC
 
 /*
+ * make_enum v1.0.3
+ * - https://github.com/jalitriver/make_enum
+ * 
  * Copyright (c) 2022 Paul Serice
  * 
  * This software is provided 'as-is', without any express or implied
