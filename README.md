@@ -5,8 +5,8 @@ functions.
 
 ## Setup
 
-Just add [make_enum.h](include/make_enum.h) to your project.  There is
-no compilation step.  The macros in `make_enum.h` cause the C/C++
+Just add [make_enum.h](make_enum.h) to your project.  There is no
+compilation step.  The macros in `make_enum.h` cause the C/C++
 preprocess to automatically generate the code and pass it to the
 compiler as part of the compilation unit.
 
