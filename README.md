@@ -107,8 +107,8 @@ enumeration in the name of the function:
              bool with_element_name);
     ```
 
-      Note that if e is an `enum`, `ToString(e)` defaults to return
-      just the element name, e.g., `FOO`.  If e is an `ename class`,
+      If e is an `enum`, `ToString(e)` defaults to return just the
+      element name, e.g., `FOO`.  If e is an `ename class`,
       `ToString(e)` defaults to return the scoped name, e.g.,
       `MyEnum::FOO`.
 
