@@ -45,15 +45,15 @@
  *     // X that will operate on each element.  The "MyEnum" below
  *     // however should be the name of your enumeration.
  *     #include "make_enum.h"
- *     #define MY_ENUM_ELEMENTS(EnumName, X)    \
+ *     #define FOREACH_IN_MY_ENUM(EnumName, X)  \
  *         X(EnumName, FOO, 0)                  \
  *         X(EnumName, BAR, 1)                  \
  *         X(EnumName, BAZ, 2)
- *     MAKE_ENUM_DECLARATION(MyEnum, MY_ENUM_ELEMENTS)
+ *     MAKE_ENUM_DECLARATION(MyEnum, FOREACH_IN_MY_ENUM)
  *
  *     // Put in source file.
  *     #include "my_header.h"
- *     MAKE_ENUM_DEFINITION(MyEnum, MY_ENUM_ELEMENTS)
+ *     MAKE_ENUM_DEFINITION(MyEnum, FOREACH_IN_MY_ENUM)
  * </code>
  *
  * If you are using C++ scoped enumerations (i.e., <c>enum class</c>),
@@ -62,8 +62,8 @@
  * same: <p>
  *
  * <code>
- *     MAKE_ENUM_CLASS_DECLARATION(MyEnum, MY_ENUM_ELEMENTS)
- *     MAKE_ENUM_CLASS_DEFINITION(MyEnum, MY_ENUM_ELEMENTS)
+ *     MAKE_ENUM_CLASS_DECLARATION(MyEnum, FOREACH_IN_MY_ENUM)
+ *     MAKE_ENUM_CLASS_DEFINITION(MyEnum, FOREACH_IN_MY_ENUM)
  * <code>
  *
  *
@@ -275,37 +275,37 @@
 
 /**
  * Internal macro for defining the <c>EnumName_ToString()</c> function
- * for an <c>enum</c>.  <c>EnumName</c> and <c>EnumElements</c> should
- * be the same as the values passed into the corresponding call to
- * <c>MAKE_ENUM_DECLARATION()</c>.
+ * for an <c>enum</c>.  <c>EnumName</c> and <c>ForeachInEnum</c>
+ * should be the same as the values passed into the corresponding call
+ * to <c>MAKE_ENUM_DECLARATION()</c>.
  *
  * @param EnumName enumeration name
- * @param EnumElements enumeration elements
+ * @param ForeachInEnum macro that applies X macro for each element in enum
  * @param X macro to apply to each element
  */
-#define MAKE_ENUM_TO_STRING_DEFINITION_BASE_C(EnumName,     \
-                                              EnumElements, \
-                                              X)            \
-    const char*                                             \
-    EnumName##_ToString(enum EnumName e,                    \
-                        int with_enum_name,                 \
-                        int with_element_name)              \
-    {                                                       \
-        const char* result = "";                            \
-        switch (e) {                                        \
-            EnumElements(EnumName, X)                       \
-        default:                                            \
-            result = "";                                    \
-            break;                                          \
-        }                                                   \
-        return result;                                      \
+#define MAKE_ENUM_TO_STRING_DEFINITION_BASE_C(EnumName,         \
+                                              ForeachInEnum,    \
+                                              X)                \
+    const char*                                                 \
+    EnumName##_ToString(enum EnumName e,                        \
+                        int with_enum_name,                     \
+                        int with_element_name)                  \
+    {                                                           \
+        const char* result = "";                                \
+        switch (e) {                                            \
+            ForeachInEnum(EnumName, X)                          \
+        default:                                                \
+            result = "";                                        \
+            break;                                              \
+        }                                                       \
+        return result;                                          \
     }
 
 #ifdef __cplusplus
 /**
  * Internal macro for defining the overloaded <c>ToString()</c> and
  * <c>operator<<()</c> functions for an <c>enum</c> or an <c>enum
- * class</c>.  <c>EnumName</c> and <c>EnumElements</c> should be the
+ * class</c>.  <c>EnumName</c> and <c>ForeachInEnum</c> should be the
  * same as the values passed into the corresponding call to
  * <c>MAKE_ENUM_DECLARATION()</c> or
  * <c>MAKE_ENUM_CLASS_DECLARATION()</c>. <p>
@@ -320,10 +320,10 @@
  * (e.g., "MyEnum::FOO"). <p>
  *
  * @param EnumName enumeration name
- * @param EnumElements enumeration elements
+ * @param ForeachInEnum macro that applies X macro for each element in enum
  */
 #define MAKE_ENUM_TO_STRING_DEFINITION_BASE_CXX(EnumName,       \
-                                                EnumElements)   \
+                                                ForeachInEnum)  \
     std::string                                                 \
     ToString(EnumName e,                                        \
              bool with_enum_name,                               \
@@ -347,53 +347,53 @@
 /**
  * C version of internal macro for defining the
  * <c>EnumName_ToString()</c> function for an <c>enum</c>.
- * <c>EnumName</c> and <c>EnumElements</c> should be the same as the
+ * <c>EnumName</c> and <c>ForeachInEnum</c> should be the same as the
  * values passed into the corresponding call to
  * <c>MAKE_ENUM_DECLARATION()</c>.
  *
  * @param EnumName enumeration name
- * @param EnumElements enumeration elements
+ * @param ForeachInEnum macro that applies X macro for each element in enum
  */
 #define MAKE_ENUM_TO_STRING_DEFINITION(EnumName,                    \
-                                       EnumElements)                \
+                                       ForeachInEnum)               \
     MAKE_ENUM_TO_STRING_DEFINITION_BASE_C(EnumName,                 \
-                                          EnumElements,             \
+                                          ForeachInEnum,            \
                                           X_MAKE_ENUM_TO_STRING)
 #else
 /**
  * C++ version of internal macro for defining the
  * <c>EnumName_ToString()</c> function as well as overloaded
  * <c>ToString()</c> and <c>operator<<()</c> functions for an
- * <c>enum</c>.  <c>EnumName</c> and <c>EnumElements</c> should be the
- * same as the values passed into the corresponding call to
+ * <c>enum</c>.  <c>EnumName</c> and <c>ForeachInEnum</c> should be
+ * the same as the values passed into the corresponding call to
  * <c>MAKE_ENUM_DECLARATION()</c>.
  *
  * @param EnumName enumeration name
- * @param EnumElements enumeration elements
+ * @param ForeachInEnum macro that applies X macro for each element in enum
  */
-#define MAKE_ENUM_TO_STRING_DEFINITION(EnumName,                    \
-                                       EnumElements)                \
-    MAKE_ENUM_TO_STRING_DEFINITION_BASE_C(EnumName,                 \
-                                          EnumElements,             \
-                                          X_MAKE_ENUM_TO_STRING)    \
-    MAKE_ENUM_TO_STRING_DEFINITION_BASE_CXX(EnumName, EnumElements)
+#define MAKE_ENUM_TO_STRING_DEFINITION(EnumName,                        \
+                                       ForeachInEnum)                   \
+    MAKE_ENUM_TO_STRING_DEFINITION_BASE_C(EnumName,                     \
+                                          ForeachInEnum,                \
+                                          X_MAKE_ENUM_TO_STRING)        \
+    MAKE_ENUM_TO_STRING_DEFINITION_BASE_CXX(EnumName, ForeachInEnum)
 
 /**
  * Internal macro for defining the <c>EnumName_ToString()</c> function
  * as well as overloaded <c>ToString()</c> and <c>operator<<()</c>
  * functions for an <c>enum class</c>.  <c>EnumName</c> and
- * <c>EnumElements</c> should be the same as the values passed into
+ * <c>ForeachInEnum</c> should be the same as the values passed into
  * the corresponding call to <c>MAKE_ENUM_DECLARATION()</c>.
  *
  * @param EnumName enumeration name
- * @param EnumElements enumeration elements
+ * @param ForeachInEnum macro that applies X macro for each element in enum
  */
 #define MAKE_ENUM_CLASS_TO_STRING_DEFINITION(EnumName,                  \
-                                             EnumElements)              \
+                                             ForeachInEnum)             \
     MAKE_ENUM_TO_STRING_DEFINITION_BASE_C(EnumName,                     \
-                                          EnumElements,                 \
+                                          ForeachInEnum,                \
                                           X_MAKE_ENUM_CLASS_TO_STRING)  \
-    MAKE_ENUM_TO_STRING_DEFINITION_BASE_CXX(EnumName, EnumElements)
+    MAKE_ENUM_TO_STRING_DEFINITION_BASE_CXX(EnumName, ForeachInEnum)
 #endif  /*  __cplusplus  */
 
 /************************************************************************
@@ -488,15 +488,15 @@
 /**
  * Internal macro for defining the <c>EnumName_FromString()</c>
  * function for an <c>enum</c>.  <c>EnumName</c> and
- * <c>EnumElements</c> should be the same as the values passed into
+ * <c>ForeachInEnum</c> should be the same as the values passed into
  * the corresponding call to <c>MAKE_ENUM_DECLARATION()</c>.
  *
  * @param EnumName enumeration name
- * @param EnumElements enumeration elements
+ * @param ForeachInEnum macro that applies X macro for each element in enum
  * @param X macro to apply to each element
  */
 #define MAKE_ENUM_FROM_STRING_DEFINITION_BASE_C(EnumName,       \
-                                                EnumElements,   \
+                                                ForeachInEnum,  \
                                                 X)              \
     int                                                         \
     EnumName##_FromString(enum EnumName* e,                     \
@@ -507,7 +507,7 @@
         if (!s || !e) {                                         \
             goto out;                                           \
         }                                                       \
-        EnumElements(EnumName, X)                               \
+        ForeachInEnum(EnumName, X)                              \
                                                                 \
      out:                                                       \
         return result;                                          \
@@ -517,7 +517,7 @@
 /**
  * Internal macro for defining the overloaded <c>FromString()</c> and
  * <c>operator>>()</c> functions for an <c>enum</c> or an <c>enum
- * class</c>.  <c>EnumName</c> and <c>EnumElements</c> should be the
+ * class</c>.  <c>EnumName</c> and <c>ForeachInEnum</c> should be the
  * same as the values passed into the corresponding call to
  * <c>MAKE_ENUM_DECLARATION()</c> or
  * <c>MAKE_ENUM_CLASSDECLARATION()</c>. <p>
@@ -527,25 +527,25 @@
  * <c>EnumName_FromString()</c> function which is defined
  * elsewhere. <p>
  */
-#define MAKE_ENUM_FROM_STRING_DEFINITION_BASE_CXX(EnumName,     \
-                                                  EnumElements) \
-    bool                                                        \
-    FromString(EnumName& e,                                     \
-               const std::string& s)                            \
-    {                                                           \
-        return (bool)EnumName##_FromString(&e, s.c_str());      \
-    }                                                           \
-                                                                \
-    std::istream&                                               \
-    operator>>(std::istream& istrm,                             \
-               EnumName& e)                                     \
-    {                                                           \
-        std::string token;                                      \
-        istrm >> token;                                         \
-        if (!FromString(e, token)) {                            \
-            istrm.setstate(std::ios::failbit);                  \
-        }                                                       \
-        return istrm;                                           \
+#define MAKE_ENUM_FROM_STRING_DEFINITION_BASE_CXX(EnumName,         \
+                                                  ForeachInEnum)    \
+    bool                                                            \
+    FromString(EnumName& e,                                         \
+               const std::string& s)                                \
+    {                                                               \
+        return (bool)EnumName##_FromString(&e, s.c_str());          \
+    }                                                               \
+                                                                    \
+    std::istream&                                                   \
+    operator>>(std::istream& istrm,                                 \
+               EnumName& e)                                         \
+    {                                                               \
+        std::string token;                                          \
+        istrm >> token;                                             \
+        if (!FromString(e, token)) {                                \
+            istrm.setstate(std::ios::failbit);                      \
+        }                                                           \
+        return istrm;                                               \
     }
 #endif
 
@@ -553,56 +553,56 @@
 /**
  * C version of internal macro for defining the
  * <c>EnumName_FromString()</c> function for an <c>enum</c>.
- * <c>EnumName</c> and <c>EnumElements</c> should be the same as the
+ * <c>EnumName</c> and <c>ForeachInEnum</c> should be the same as the
  * values passed into the corresponding call to
  * <c>MAKE_ENUM_DECLARATION()</c>.
  *
  * @param EnumName enumeration name
- * @param EnumElements enumeration elements
+ * @param ForeachInEnum macro that applies X macro for each element in enum
  * @param X macro to apply to each element
  */
-#define MAKE_ENUM_FROM_STRING_DEFINITION(EnumName,                    \
-                                         EnumElements)                \
-    MAKE_ENUM_FROM_STRING_DEFINITION_BASE_C(EnumName,                 \
-                                            EnumElements,             \
+#define MAKE_ENUM_FROM_STRING_DEFINITION(EnumName,                      \
+                                         ForeachInEnum)                 \
+    MAKE_ENUM_FROM_STRING_DEFINITION_BASE_C(EnumName,                   \
+                                            ForeachInEnum,              \
                                             X_MAKE_ENUM_FROM_STRING)
 #else
 /**
  * C++ version of internal macro for defining the
  * <c>EnumName_FromString()</c> function as well as overloaded
  * <c>FromString()</c> and <c>operator>>()</c> functions for an
- * <c>enum</c>.  <c>EnumName</c> and <c>EnumElements</c> should be the
- * same as the values passed into the corresponding call to
+ * <c>enum</c>.  <c>EnumName</c> and <c>ForeachInEnum</c> should be
+ * the same as the values passed into the corresponding call to
  * <c>MAKE_ENUM_DECLARATION()</c>.
  *
  * @param EnumName enumeration name
- * @param EnumElements enumeration elements
+ * @param ForeachInEnum macro that applies X macro for each element in enum
  * @param X macro to apply to each element
  */
-#define MAKE_ENUM_FROM_STRING_DEFINITION(EnumName,                    \
-                                         EnumElements)                \
-    MAKE_ENUM_FROM_STRING_DEFINITION_BASE_C(EnumName,                 \
-                                            EnumElements,             \
-                                            X_MAKE_ENUM_FROM_STRING)  \
-    MAKE_ENUM_FROM_STRING_DEFINITION_BASE_CXX(EnumName, EnumElements)
+#define MAKE_ENUM_FROM_STRING_DEFINITION(EnumName,                      \
+                                         ForeachInEnum)                 \
+    MAKE_ENUM_FROM_STRING_DEFINITION_BASE_C(EnumName,                   \
+                                            ForeachInEnum,              \
+                                            X_MAKE_ENUM_FROM_STRING)    \
+    MAKE_ENUM_FROM_STRING_DEFINITION_BASE_CXX(EnumName, ForeachInEnum)
 
 /**
  * Internal macro for defining the <c>EnumName_FromString()</c>
  * function as well as overloaded <c>FromString()</c> and
  * <c>operator>>()</c> functions for an <c>enum class</c>.
- * <c>EnumName</c> and <c>EnumElements</c> should be the same as the
+ * <c>EnumName</c> and <c>ForeachInEnum</c> should be the same as the
  * values passed into the corresponding call to
  * <c>MAKE_ENUM_DECLARATION()</c>.
  *
  * @param EnumName enumeration name
- * @param EnumElements enumeration elements
+ * @param ForeachInEnum macro that applies X macro for each element in enum
  */
 #define MAKE_ENUM_CLASS_FROM_STRING_DEFINITION(EnumName,                   \
-                                               EnumElements)               \
+                                               ForeachInEnum)              \
     MAKE_ENUM_FROM_STRING_DEFINITION_BASE_C(EnumName,                      \
-                                            EnumElements,                  \
+                                            ForeachInEnum,                 \
                                             X_MAKE_ENUM_CLASS_FROM_STRING) \
-    MAKE_ENUM_FROM_STRING_DEFINITION_BASE_CXX(EnumName, EnumElements)
+    MAKE_ENUM_FROM_STRING_DEFINITION_BASE_CXX(EnumName, ForeachInEnum)
 #endif  /*  __cplusplus  */
 
 /************************************************************************
@@ -678,23 +678,23 @@
 
 /**
  * Internal macro for defining the <c>EnumName_IsValid()</c> function
- * for an <c>enum</c>.  <c>EnumName</c> and <c>EnumElements</c> should
- * be the same as the values passed into the corresponding call to
- * <c>MAKE_ENUM_DECLARATION()</c>.
+ * for an <c>enum</c>.  <c>EnumName</c> and <c>ForeachInEnum</c>
+ * should be the same as the values passed into the corresponding call
+ * to <c>MAKE_ENUM_DECLARATION()</c>.
  *
  * @param EnumName enumeration name
- * @param EnumElements enumeration elements
+ * @param ForeachInEnum macro that applies X macro for each element in enum
  * @param X macro to apply to each element
  */
 #define MAKE_ENUM_IS_VALID_DEFINITION_BASE_C(EnumName,      \
-                                             EnumElements,  \
+                                             ForeachInEnum, \
                                              X)             \
     int                                                     \
     EnumName##_IsValid(enum EnumName e)                     \
     {                                                       \
         int result = 0;                                     \
         switch (e) {                                        \
-            EnumElements(EnumName, X)                       \
+            ForeachInEnum(EnumName, X)                      \
             result = 1;                                     \
             break;                                          \
         default:                                            \
@@ -707,7 +707,7 @@
 /**
  * Internal macro for defining the overloaded <c>IsValid()</c>
  * function for an <c>enum</c> or an <c>enum class</c>.
- * <c>EnumName</c> and <c>EnumElements</c> should be the same as the
+ * <c>EnumName</c> and <c>ForeachInEnum</c> should be the same as the
  * values passed into the corresponding call to
  * <c>MAKE_ENUM_DECLARATION()</c> or
  * <c>MAKE_ENUM_CLASS_DECLARATION()</c>. <p>
@@ -718,7 +718,7 @@
  * elsewhere. <p>
  */
 #define MAKE_ENUM_IS_VALID_DEFINITION_BASE_CXX(EnumName,        \
-                                               EnumElements)    \
+                                               ForeachInEnum)   \
     bool                                                        \
     IsValid(EnumName e)                                         \
     {                                                           \
@@ -730,54 +730,54 @@
 /**
  * C version of internal macro for defining the
  * <c>EnumName_IsValid()</c> function for an <c>enum</c>.
- * <c>EnumName</c> and <c>EnumElements</c> should be the same as the
+ * <c>EnumName</c> and <c>ForeachInEnum</c> should be the same as the
  * values passed into the corresponding call to
  * <c>MAKE_ENUM_DECLARATION()</c>.
  *
  * @param EnumName enumeration name
- * @param EnumElements enumeration elements
+ * @param ForeachInEnum macro that applies X macro for each element in enum
  */
 #define MAKE_ENUM_IS_VALID_DEFINITION(EnumName,                 \
-                                      EnumElements)             \
+                                      ForeachInEnum)            \
     MAKE_ENUM_IS_VALID_DEFINITION_BASE_C(EnumName,              \
-                                       EnumElements,            \
+                                       ForeachInEnum,           \
                                        X_MAKE_ENUM_IS_VALID)
 #else
 /**
  * C++ version of internal macro for defining the
  * <c>EnumName_IsValid()</c> function as well as an overloaded
  * <c>IsValid()</c> function for an <c>enum class</c>.
- * <c>EnumName</c> and <c>EnumElements</c> should be the same as the
+ * <c>EnumName</c> and <c>ForeachInEnum</c> should be the same as the
  * values passed into the corresponding call to
  * <c>MAKE_ENUM_DECLARATION()</c>.
  *
  * @param EnumName enumeration name
- * @param EnumElements enumeration elements
+ * @param ForeachInEnum macro that applies X macro for each element in enum
  */
 #define MAKE_ENUM_IS_VALID_DEFINITION(EnumName,                     \
-                                      EnumElements)                 \
+                                      ForeachInEnum)                \
     MAKE_ENUM_IS_VALID_DEFINITION_BASE_C(EnumName,                  \
-                                         EnumElements,              \
+                                         ForeachInEnum,             \
                                          X_MAKE_ENUM_IS_VALID)      \
-    MAKE_ENUM_IS_VALID_DEFINITION_BASE_CXX(EnumName, EnumElements)
+    MAKE_ENUM_IS_VALID_DEFINITION_BASE_CXX(EnumName, ForeachInEnum)
 
 /**
  * C++ version of internal macro for defining the
  * <c>EnumName_IsValid()</c> function as well as an overloaded
  * <c>IsValid()</c> function for an <c>enum class</c>.
- * <c>EnumName</c> and <c>EnumElements</c> should be the same as the
+ * <c>EnumName</c> and <c>ForeachInEnum</c> should be the same as the
  * values passed into the corresponding call to
  * <c>MAKE_ENUM_DECLARATION()</c>.
  *
  * @param EnumName enumeration name
- * @param EnumElements enumeration elements
+ * @param ForeachInEnum macro that applies X macro for each element in enum
  */
 #define MAKE_ENUM_CLASS_IS_VALID_DEFINITION(EnumName,               \
-                                            EnumElements)           \
+                                            ForeachInEnum)          \
     MAKE_ENUM_IS_VALID_DEFINITION_BASE_C(EnumName,                  \
-                                       EnumElements,                \
+                                       ForeachInEnum,               \
                                        X_MAKE_ENUM_CLASS_IS_VALID)  \
-    MAKE_ENUM_IS_VALID_DEFINITION_BASE_CXX(EnumName, EnumElements)
+    MAKE_ENUM_IS_VALID_DEFINITION_BASE_CXX(EnumName, ForeachInEnum)
 #endif  /*  __cplusplus  */
 
 /************************************************************************
@@ -797,24 +797,24 @@
 
 /**
  * Declare only the enumeration <c>EnumName</c> having elements
- * <c>EnumElements</c>.  The enumeration will be of type
+ * <c>ForeachInEnum</c>.  The enumeration will be of type
  * <c>EnumType</c> which should be <c>enum</c> for C/C++ code or
  * <c>enum class</c> for C++ code.
  *
  * @param EnumType enumeration type (enum or enum class)
  * @param EnumName enumeration name
- * @param EnumElements enumeration elements
+ * @param ForeachInEnum macro that applies X macro for each element in enum
  */
-#define MAKE_ENUM_DECLARATION_ONLY(EnumType, EnumName, EnumElements)    \
+#define MAKE_ENUM_DECLARATION_ONLY(EnumType, EnumName, ForeachInEnum)   \
     EnumType EnumName {                                                 \
-        EnumElements(EnumName, X_MAKE_ENUM_DECLARATION)                 \
+        ForeachInEnum(EnumName, X_MAKE_ENUM_DECLARATION)                \
     };
 
 /**
  * Declare the <c>enum</c> enumeration <c>EnumName</c> having elements
- * <c>EnumElements</c>.  This macro belongs in your header file along
+ * <c>ForeachInEnum</c>.  This macro belongs in your header file along
  * with <c>MAKE_ENUM_DEFINITION()</c> in your source file.  Both
- * <c>EnumName</c> and <c>EnumElements</c> should match whatever will
+ * <c>EnumName</c> and <c>ForeachInEnum</c> should match whatever will
  * be passed into <c>MAKE_ENUM_DEFINITION()</c>. <p>
  *
  * The following code example shows how to declare an enumeration
@@ -823,18 +823,18 @@
  * but *do* replace "MyEnum" with the name of your enumeration: <p>
  *
  * <code>
- *     #define MY_ENUM_ELEMENTS(EnumName, X) \
- *         X(EnumName, FOO, 0) \
- *         X(EnumName, BAR, 1) \
+ *     #define FOREACH_IN_MY_ENUM(EnumName, X)  \
+ *         X(EnumName, FOO, 0)                  \
+ *         X(EnumName, BAR, 1)                  \
  *         X(EnumName, BAZ, 2)
- *     MAKE_ENUM_DECLARATION(MyEnum, MY_ENUM_ELEMENTS)
+ *     MAKE_ENUM_DECLARATION(MyEnum, FOREACH_IN_MY_ENUM)
  * </code>
  *
  * @param EnumName enumeration name
- * @param EnumElements enumeration elements
+ * @param ForeachInEnum macro that applies X macro for each element in enum
  */
-#define MAKE_ENUM_DECLARATION(EnumName, EnumElements)           \
-    MAKE_ENUM_DECLARATION_ONLY(enum, EnumName, EnumElements)    \
+#define MAKE_ENUM_DECLARATION(EnumName, ForeachInEnum)          \
+    MAKE_ENUM_DECLARATION_ONLY(enum, EnumName, ForeachInEnum)   \
     MAKE_ENUM_TO_STRING_DECLARATION(EnumName)                   \
     MAKE_ENUM_FROM_STRING_DECLARATION(EnumName)                 \
     MAKE_ENUM_IS_VALID_DECLARATION(EnumName)
@@ -842,10 +842,11 @@
 #ifdef __cplusplus
 /**
  * Declare the <c>enum class</c> enumeration <c>EnumName</c> having
- * elements <c>EnumElements</c>.  This macro belongs in your header
+ * elements <c>ForeachInEnum</c>.  This macro belongs in your header
  * file along with <c>MAKE_ENUM_CLASS_DEFINITION()</c> in your source
- * file.  Both <c>EnumName</c> and <c>EnumElements</c> should match
- * whatever will be passed into <c>MAKE_ENUM_CLASS_DEFINITION()</c>. <p>
+ * file.  Both <c>EnumName</c> and <c>ForeachInEnum</c> should match
+ * whatever will be passed into
+ * <c>MAKE_ENUM_CLASS_DEFINITION()</c>. <p>
  *
  * The following code example shows how to declare an enumeration
  * along with all of its helper functions.  Do *not* replace
@@ -853,18 +854,18 @@
  * but *do* replace "MyEnum" with the name of your enumeration: <p>
  *
  * <code>
- *     #define MY_ENUM_ELEMENTS(EnumName, X) \
- *         X(EnumName, FOO, 0) \
- *         X(EnumName, BAR, 1) \
+ *     #define FOREACH_IN_MY_ENUM(EnumName, X)  \
+ *         X(EnumName, FOO, 0)                  \
+ *         X(EnumName, BAR, 1)                  \
  *         X(EnumName, BAZ, 2)
- *     MAKE_ENUM_CLASS_DECLARATION(MyEnum, MY_ENUM_ELEMENTS)
+ *     MAKE_ENUM_CLASS_DECLARATION(MyEnum, FOREACH_IN_MY_ENUM)
  * </code>
  *
  * @param EnumName enumeration name
- * @param EnumElements enumeration elements
+ * @param ForeachInEnum macro that applies X macro for each element in enum
  */
-#define MAKE_ENUM_CLASS_DECLARATION(EnumName, EnumElements)         \
-    MAKE_ENUM_DECLARATION_ONLY(enum class, EnumName, EnumElements)  \
+#define MAKE_ENUM_CLASS_DECLARATION(EnumName, ForeachInEnum)        \
+    MAKE_ENUM_DECLARATION_ONLY(enum class, EnumName, ForeachInEnum) \
     MAKE_ENUM_CLASS_TO_STRING_DECLARATION(EnumName)                 \
     MAKE_ENUM_FROM_STRING_DECLARATION(EnumName)                     \
     MAKE_ENUM_IS_VALID_DECLARATION(EnumName)
@@ -876,37 +877,37 @@
 
 /**
  * Define the help functions for the enumeration <c>EnumName</c>
- * having elements <c>EnumElements</c>.  This macro belongs in your
+ * having elements <c>ForeachInEnum</c>.  This macro belongs in your
  * source file along with <c>MAKE_ENUM_DECLARATION()</c> in your
- * header file.  Both <c>EnumName</c> and <c>EnumElements</c> should
+ * header file.  Both <c>EnumName</c> and <c>ForeachInEnum</c> should
  * match whatever was passed into an earlier call to
  * <c>MAKE_ENUM_DECLARATION()</c>.
  *
  * @param EnumName enumeration name
- * @param EnumElements enumeration elements
+ * @param ForeachInEnum macro that applies X macro for each element in enum
  */
-#define MAKE_ENUM_DEFINITION(EnumName, EnumElements)            \
-    MAKE_ENUM_TO_STRING_DEFINITION(EnumName, EnumElements)      \
-    MAKE_ENUM_FROM_STRING_DEFINITION(EnumName, EnumElements)    \
-    MAKE_ENUM_IS_VALID_DEFINITION(EnumName, EnumElements)
+#define MAKE_ENUM_DEFINITION(EnumName, ForeachInEnum)           \
+    MAKE_ENUM_TO_STRING_DEFINITION(EnumName, ForeachInEnum)     \
+    MAKE_ENUM_FROM_STRING_DEFINITION(EnumName, ForeachInEnum)   \
+    MAKE_ENUM_IS_VALID_DEFINITION(EnumName, ForeachInEnum)
 
 #ifdef __cplusplus
 /**
  * Define the help functions for the scoped enumeration (i.e., <c>enum
- * class</c>) <c>EnumName</c> having elements <c>EnumElements</c>.
+ * class</c>) <c>EnumName</c> having elements <c>ForeachInEnum</c>.
  * This macro belongs in your source file along with
  * <c>MAKE_ENUM_CLASS_DECLARATION()</c> in your header file.  Both
- * <c>EnumName</c> and <c>EnumElements</c> should match whatever was
+ * <c>EnumName</c> and <c>ForeachInEnum</c> should match whatever was
  * passed into an earlier call to
  * <c>MAKE_ENUM_CLASS_DECLARATION()</c>.
  *
  * @param EnumName enumeration name
- * @param EnumElements enumeration elements
+ * @param ForeachInEnum macro that applies X macro for each element in enum
  */
-#define MAKE_ENUM_CLASS_DEFINITION(EnumName, EnumElements)          \
-    MAKE_ENUM_CLASS_TO_STRING_DEFINITION(EnumName, EnumElements)    \
-    MAKE_ENUM_CLASS_FROM_STRING_DEFINITION(EnumName, EnumElements)  \
-    MAKE_ENUM_CLASS_IS_VALID_DEFINITION(EnumName, EnumElements)
+#define MAKE_ENUM_CLASS_DEFINITION(EnumName, ForeachInEnum)         \
+    MAKE_ENUM_CLASS_TO_STRING_DEFINITION(EnumName, ForeachInEnum)   \
+    MAKE_ENUM_CLASS_FROM_STRING_DEFINITION(EnumName, ForeachInEnum) \
+    MAKE_ENUM_CLASS_IS_VALID_DEFINITION(EnumName, ForeachInEnum)
 #endif  /*  __cplusplus  */
 
 #endif  /*  MAKE_ENUM_H_LWER8VDLTCWRMVF19GJNGDHC  */

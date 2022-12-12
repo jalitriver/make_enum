@@ -24,33 +24,46 @@ functions:
 
 ### Header File
 
-Add the either the `MAKE_ENUM_DECLARATION()` or
-`MAKE_ENUM_CLASS_DECLARATION` to your header as follows:
+As show below, set up a `FOREACH` macro that can apply an `X` macro
+for each element in the enumeration.  In order to generate element
+names like `"MyEnum::FOO"`, an additional `EnumName` parameter needs
+to be passed through the `FOREACH` macro to the `X` macro.  Then, add
+the either the `MAKE_ENUM_DECLARATION()` or
+`MAKE_ENUM_CLASS_DECLARATION` to your header to declare the
+enumeration and its helper functions:
 
   ```cpp
   #include "make_enum.h"
-  #define MY_ENUM_ELEMENTS(EnumName, X)    \
-      X(EnumName, FOO, 0)                  \
-      X(EnumName, BAR, 1)                  \
+  #define FOREACH_IN_MY_ENUM(EnumName, X) \
+      X(EnumName, FOO, 0)                 \
+      X(EnumName, BAR, 1)                 \
       X(EnumName, BAZ, 2)
-  MAKE_ENUM_DECLARATION(MyEnum, MY_ENUM_ELEMENTS)
+  MAKE_ENUM_DECLARATION(MyEnum, FOREACH_IN_MY_ENUM)
   ```
 
-Replace `MyEnum` and `MY_ENUM_ELEMENTS` above with the name and
+Replace `MyEnum` and `FOREACH_IN_MY_ENUM` above with the name and
 elements of the enumeration.
 
 For scoped enumerations in modern C++, use
 `MAKE_ENUM_CLASS_DECLARATION()` instead of `MAKE_ENUM_DECLARATION()`.
 
+See [X Macros](https://en.wikipedia.org/wiki/X_Macro) on Wikipedia for
+more information on how X Macros work.
+
 ### Source File
 
 Add the corresponding `MAKE_ENUM_DEFINITION()` or
-`MAKE_ENUM_CLASS_DEFINITION()` to your source file as follows:
+`MAKE_ENUM_CLASS_DEFINITION()` to your source file to define the
+helper functions:
 
   ```cpp
   #include "my_header.h"
-  MAKE_ENUM_DEFINITION(MyEnum, MY_ENUM_ELEMENTS)
+  MAKE_ENUM_DEFINITION(MyEnum, FOREACH_IN_MY_ENUM)
   ```
+  
+Replace `FOREACH_IN_MY_ENUM` with the name of the `FOREACH` macro that
+was passed into the corresponding `MAKE_ENUM_DEFINITION()` call in the
+header file.
 
 For scoped enumerations in modern C++, use
 `MAKE_ENUM_CLASS_DEFINITION()` instead of `MAKE_ENUM_DEFINITION()`.
