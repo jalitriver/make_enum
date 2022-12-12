@@ -88,24 +88,28 @@ the following overloaded functions that do not include the name of the
 enumeration in the name of the function:
 
   * ```cpp
-    std::string ToString(EnumName e,
-                         bool with_enum_name,
-                         bool with_element_name);
+    std::string
+    ToString(EnumName e,
+             bool with_enum_name,
+             bool with_element_name);
     ```
 
   * ```cpp
-    bool FromString(EnumName& e,
-                    const std::string& s)
+    bool
+    FromString(EnumName& e,
+               const std::string& s)
     ```
 
   * ```cpp
-    std::ostream& operator<<(std::ostream& ostrm,
-                             EnumName e);
+    std::ostream&
+    operator<<(std::ostream& ostrm,
+               EnumName e);
     ```
 
   * ```cpp
-    std::istream& operator>>(std::istream& istrm,
-                             EnumName& e);
+    std::istream&
+    operator>>(std::istream& istrm,
+               EnumName& e);
     ```
 
   * ```cpp
