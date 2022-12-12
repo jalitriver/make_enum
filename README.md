@@ -3,14 +3,22 @@
 Macros for C/C++ that are used to define enumerations and their helper
 functions.
 
+## Setup
+
+Just add [make_enum.h](include/make_enum.h) to your project.  There is
+no compilation step.  The macros in `make_enum.h` cause the C/C++
+preprocess to automatically generate the code and pass it to the
+compiler as part of the compilation unit.
+
 ## Usage
 
-The macros are divided into "declaration" macros that belong in header
-files and "definition" macros that belong in source files.  It is done
-this way because it is difficult to portably and safely inline the
-helper functions in a header.  The following is typically all you need
-to do to use these macros to declare and define an enumeration along
-with all of its helper functions:
+The macros in `make_enum.h` are divided into "declaration" macros
+(that belong in header files) and "definition" macros (that belong in
+source files).  It is done this way because it is difficult to
+portably and safely inline the helper functions in a header.  The
+following is typically all you need to do to use these macros to
+declare and define an enumeration along with all of its helper
+functions:
 
 ### Header File
 
@@ -42,6 +50,9 @@ Add the corresponding `MAKE_ENUM_DEFINITION()` or
   MAKE_ENUM_DEFINITION(MyEnum, MY_ENUM_ELEMENTS)
   ```
 
+For scoped enumerations in modern C++, use
+`MAKE_ENUM_CLASS_DEFINITION()` instead of `MAKE_ENUM_DEFINITION()`.
+
 ## Helper Functions
 
 ### C Helper Functions
@@ -51,18 +62,21 @@ where `<EnumName>` should be replaced with the name of the
 enumeration:
 
   *  ```cpp
-     const char* <EnumName>_ToString(enum EnumName e,
-                                     int with_enum_name,
-                                     int with_element_name);
+     const char*
+     <EnumName>_ToString(enum EnumName e,
+                         int with_enum_name,
+                         int with_element_name);
      ```
 
   * ```cpp
-    int EnumName_FromString(enum EnumName* e,
-                            const char* s);
+    int
+    <EnumName>_FromString(enum EnumName* e,
+                          const char* s);
     ```
 
   * ```cpp
-    int EnumName_IsValid(enum EnumName e);
+    int
+    <EnumName>_IsValid(enum EnumName e);
     ```
 
 ### C++ Helper Functions
