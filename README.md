@@ -1,14 +1,16 @@
 # make_enum
 
 Macros for C/C++ that are used to define enumerations and their helper
-functions.
+functions.  The `enum` macros should work with any standards compliant
+C/C++ compiler.  The `enum class` macros require a C++11 compiler.
+The macros have been tested with GCC, Clang, and MSVC++.
 
 ## Setup
 
-Just add [make_enum.h](make_enum.h) to your project.  There is no
+Just add [make_enum.h](include/make_enum.h) to your project.  There is no
 compilation step.  The macros in `make_enum.h` cause the C/C++
-preprocess to automatically generate the code and pass it to the
-compiler as part of the compilation unit.
+preprocess to automatically generate the code and pass it directly to
+the compiler as part of the compilation unit.
 
 ## Usage
 
